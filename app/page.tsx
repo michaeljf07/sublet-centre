@@ -1,65 +1,88 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { Header } from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { Hero } from "@/components/home/Hero";
+import { ListingGrid } from "@/components/listings/ListingGrid";
+import { Listing } from "@/types";
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedListing, setSelectedListing] = useState<Listing | null>(
+        null
+    );
+
+    // This would come from your API
+    const listings: Listing[] = [
+        {
+            id: 1,
+            title: "Sunny Studio in Midtown",
+            description:
+                "A bright, modern studio apartment close to public transport.",
+            price: 1800,
+            address: "123 Midtown Ave, New York, NY",
+            moveIn: "2024-07-01",
+            moveOut: "2024-12-31",
+            bedrooms: 1,
+            bathrooms: 1,
+            image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+            amenities: ["WiFi", "Laundry", "Gym"],
+            distance: "0.5 mi from campus",
+            poster: "Alice",
+        },
+        {
+            id: 2,
+            title: "Spacious 2BR with Balcony",
+            description:
+                "Large two-bedroom apartment with a private balcony and city views.",
+            price: 2500,
+            address: "456 Uptown Blvd, New York, NY",
+            moveIn: "2024-08-15",
+            moveOut: "2025-01-15",
+            bedrooms: 2,
+            bathrooms: 2,
+            image: "https://images.unsplash.com/photo-1464983953574-0892a716854b",
+            amenities: ["Balcony", "Parking", "Pet Friendly"],
+            distance: "1.2 mi from campus",
+            poster: "Bob",
+        },
+        {
+            id: 3,
+            title: "Cozy Room in Shared Flat",
+            description:
+                "Private room in a friendly, shared apartment. Utilities included.",
+            price: 950,
+            address: "789 Downtown Rd, New York, NY",
+            moveIn: "2024-09-01",
+            moveOut: "2025-05-31",
+            bedrooms: 1,
+            bathrooms: 1,
+            image: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd",
+            amenities: ["Utilities Included", "Shared Kitchen", "Furnished"],
+            distance: "0.8 mi from campus",
+            poster: "Carol",
+        },
+    ];
+
+    const handleSearch = () => {
+        // Implement search logic
+        console.log("Searching for:", searchTerm);
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <Header />
+            <Hero
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                onSearch={handleSearch}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <ListingGrid
+                listings={listings}
+                onSelectListing={setSelectedListing}
+            />
+            <Footer />
         </div>
-      </main>
-    </div>
-  );
+    );
 }
