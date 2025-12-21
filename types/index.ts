@@ -4,11 +4,11 @@ export interface Listing {
     description: string;
     price: number;
     address: string;
-    moveIn: string;
-    moveOut: string;
+    moveIn: string | Date;
+    moveOut: string | Date;
     bedrooms: number;
     bathrooms: number;
-    image: string;
+    image?: string;
     amenities: string[];
     distance: string;
     poster: string;

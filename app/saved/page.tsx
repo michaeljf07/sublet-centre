@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Hero } from "@/components/home/Hero";
 import { ListingGrid } from "@/components/listings/ListingGrid";
+import { useFavorites } from "@/lib/favorites-context";
 import { Listing } from "@/types";
 
-export default function Home() {
-    const [inputValue, setInputValue] = useState<string>("");
-    const [searchTerm, setSearchTerm] = useState<string>("");
+export default function SavedPage() {
+    const { favorites } = useFavorites();
     const [selectedListing, setSelectedListing] = useState<Listing | null>(
         null
     );
@@ -41,7 +40,7 @@ export default function Home() {
                         bathrooms: listing.bathrooms,
                         image: listing.image,
                         amenities: listing.amenities || [],
-                        distance: "TBD", // fix later with real distance calculation
+                        distance: "TBD",
                         poster: listing.posterName || "User",
                     })
                 );
@@ -60,71 +59,56 @@ export default function Home() {
         fetchListings();
     }, []);
 
-    // Filter listings based on search term
-    const filteredListings = useMemo(() => {
-        if (!searchTerm.trim()) {
-            return listings;
-        }
-
-        const term = searchTerm.toLowerCase();
-        return listings.filter(
-            (listing) =>
-                listing.title.toLowerCase().includes(term) ||
-                listing.description.toLowerCase().includes(term) ||
-                listing.address.toLowerCase().includes(term) ||
-                listing.amenities.some((amenity) =>
-                    amenity.toLowerCase().includes(term)
-                )
-        );
-    }, [searchTerm, listings]);
-
-    const handleSearch = () => {
-        setSearchTerm(inputValue);
-        console.log("Searching for:", inputValue);
-    };
+    // Filter to only show favorited listings
+    const savedListings = useMemo(() => {
+        return listings.filter((listing) => favorites.has(listing.id));
+    }, [favorites, listings]);
 
     return (
         <div className="min-h-screen bg-gray-50">
             <Header />
-            <Hero
-                searchTerm={inputValue}
-                onSearchChange={setInputValue}
-                onSearch={handleSearch}
-            />
-            {loading ? (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div className="text-center">
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        Saved Listings
+                    </h1>
+                    <p className="mt-2 text-gray-600">
+                        {savedListings.length} listing
+                        {savedListings.length !== 1 ? "s" : ""} saved
+                    </p>
+                </div>
+
+                {loading ? (
+                    <div className="bg-white rounded-lg shadow p-12 text-center">
                         <p className="text-gray-600">Loading listings...</p>
                     </div>
-                </div>
-            ) : error ? (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div className="text-center">
+                ) : error ? (
+                    <div className="bg-white rounded-lg shadow p-12 text-center">
                         <p className="text-red-600">{error}</p>
                     </div>
-                </div>
-            ) : filteredListings.length > 0 ? (
-                <ListingGrid
-                    listings={filteredListings}
-                    onSelectListing={setSelectedListing}
-                />
-            ) : (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div className="text-center">
+                ) : savedListings.length > 0 ? (
+                    <ListingGrid
+                        listings={savedListings}
+                        onSelectListing={setSelectedListing}
+                    />
+                ) : (
+                    <div className="bg-white rounded-lg shadow p-12 text-center">
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                            No listings found
+                            No saved listings yet
                         </h3>
-                        <p className="text-gray-600">
-                            Try adjusting your search terms or{" "}
-                            <button
-                                onClick={() => setSearchTerm("")}
-                                className="text-blue-600 hover:text-blue-700 font-medium">
-                                view all listings
-                            </button>
+                        <p className="text-gray-600 mb-4">
+                            Start favoriting listings to save them for later
                         </p>
+                        <a
+                            href="/"
+                            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition">
+                            Browse Listings
+                        </a>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+
             <Footer />
         </div>
     );

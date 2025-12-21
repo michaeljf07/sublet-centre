@@ -1,19 +1,73 @@
 import { MapPin, Bed, Bath, Heart } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { Listing } from "@/types";
+import { useFavorites } from "@/lib/favorites-context";
+import { authClient } from "@/lib/auth-client";
 
 interface ListingCardProps {
     listing: Listing;
     onSelect: (listing: Listing) => void;
 }
 
+function formatDate(date: string | Date): string {
+    let dateObj: Date;
+    if (typeof date === "string") {
+        dateObj = new Date(date);
+    } else {
+        dateObj = date;
+    }
+    return dateObj.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+}
+
 export const ListingCard: React.FC<ListingCardProps> = ({
     listing,
     onSelect,
 }) => {
+    const { isFavorite, toggleFavorite } = useFavorites();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+    const isLiked = isFavorite(listing.id);
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const session = await authClient.getSession();
+                setIsAuthenticated(!!session?.data?.user);
+            } catch (error) {
+                setIsAuthenticated(false);
+            } finally {
+                setIsCheckingAuth(false);
+            }
+        };
+
+        checkAuth();
+    }, []);
+
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (!isAuthenticated) {
+            router.push("/auth");
+            return;
+        }
+
+        toggleFavorite(listing.id);
+    };
+
+    const handleCardClick = () => {
+        router.push(`/listings/${listing.id}`);
+    };
+
     return (
         <div
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-            onClick={() => onSelect(listing)}>
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl hover:shadow-blue-200 transition-transform cursor-pointer hover:scale-105 duration-300"
+            onClick={handleCardClick}>
             <div className="relative">
                 <img
                     src={listing.image}
@@ -21,15 +75,18 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                     className="w-full h-48 object-cover"
                 />
                 <button
-                    className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        // Handle favorite logic
-                    }}>
-                    <Heart className="w-5 h-5 text-gray-600" />
+                    className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 hover:cursor-pointer transition"
+                    onClick={handleFavoriteClick}>
+                    <Heart
+                        className={`w-5 h-5 hover:scale-110 duration-300 transition transform ${
+                            isLiked
+                                ? "fill-red-500 text-red-500"
+                                : "text-gray-600"
+                        }`}
+                    />
                 </button>
                 <div className="absolute bottom-3 left-3 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {listing.moveIn} - {listing.moveOut}
+                    {formatDate(listing.moveIn)} - {formatDate(listing.moveOut)}
                 </div>
             </div>
 
@@ -71,7 +128,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
 
                 <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
                     <span className="text-sm text-gray-500">
-                        {listing.distance}
+                        {listing.distance} from campus
                     </span>
                     <span className="text-sm text-gray-600">
                         by {listing.poster}
