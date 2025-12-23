@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Home, Bell, User, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { signOut, authClient } from "@/lib/auth-client";
+import { signOut, getSession } from "@/lib/auth-client";
 
 export const Header = () => {
     const [isSigningOut, setIsSigningOut] = useState(false);
@@ -18,15 +18,15 @@ export const Header = () => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const session = await authClient.getSession();
-                setIsAuthenticated(!!session?.data?.user);
+                const { data } = await getSession();
+                setIsAuthenticated(!!data?.session?.user);
 
-                if (session?.data?.user) {
+                if (data?.session?.user) {
                     // Fetch notifications
                     const response = await fetch("/api/notifications");
                     if (response.ok) {
-                        const data = await response.json();
-                        const unread = data.filter(
+                        const notificationData = await response.json();
+                        const unread = notificationData.filter(
                             (notif: any) => !notif.read
                         ).length;
                         setUnreadCount(unread);
@@ -40,6 +40,14 @@ export const Header = () => {
         };
 
         checkAuth();
+
+        // Re-check auth when window regains focus
+        const handleFocus = () => {
+            checkAuth();
+        };
+
+        window.addEventListener("focus", handleFocus);
+        return () => window.removeEventListener("focus", handleFocus);
     }, []);
 
     const handleSignOut = async () => {

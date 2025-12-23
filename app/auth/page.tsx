@@ -25,7 +25,10 @@ export default function AuthPage() {
                 setError("Incorrect email or password");
                 return;
             }
-            router.push("/");
+            // Wait a moment for session to be established, then refresh
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 500);
         } catch (err: any) {
             setError("Incorrect email or password");
             console.error(err);

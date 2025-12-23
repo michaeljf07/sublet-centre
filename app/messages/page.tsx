@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import { Send } from "lucide-react";
 
 interface Message {
@@ -24,8 +24,8 @@ export default function MessagesPage() {
     useEffect(() => {
         async function checkAuth() {
             try {
-                const session = await authClient.getSession();
-                if (!session?.data?.user) {
+                const { data } = await getSession();
+                if (!data?.session?.user) {
                     router.push("/auth");
                     return;
                 }

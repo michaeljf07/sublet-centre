@@ -1,7 +1,4 @@
-import { db } from "@/lib/db";
-import { listings } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { sql } from "drizzle-orm";
+import { supabaseAdmin } from "@/lib/supabase";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -13,36 +10,20 @@ export async function GET(
         const { id } = await params;
         const listingId = parseInt(id);
 
-        const listing = await db
-            .select({
-                id: listings.id,
-                userId: listings.userId,
-                title: listings.title,
-                description: listings.description,
-                price: listings.price,
-                address: listings.address,
-                moveIn: listings.moveIn,
-                moveOut: listings.moveOut,
-                bedrooms: listings.bedrooms,
-                bathrooms: listings.bathrooms,
-                image: listings.image,
-                amenities: listings.amenities,
-                createdAt: listings.createdAt,
-                updatedAt: listings.updatedAt,
-                posterName: sql<string>`(SELECT name FROM "user" WHERE "user".id = ${listings.userId})`,
-            })
-            .from(listings)
-            .where(eq(listings.id, listingId))
-            .limit(1);
+        const { data: listing, error } = await supabaseAdmin
+            .from("listings")
+            .select("*")
+            .eq("id", listingId)
+            .single();
 
-        if (listing.length === 0) {
+        if (error || !listing) {
             return new Response(
                 JSON.stringify({ error: "Listing not found" }),
                 { status: 404 }
             );
         }
 
-        return new Response(JSON.stringify(listing[0]), {
+        return new Response(JSON.stringify(listing), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });
@@ -74,20 +55,20 @@ export async function PUT(
         }
 
         // Check if user owns the listing
-        const listing = await db
-            .select()
-            .from(listings)
-            .where(eq(listings.id, listingId))
-            .limit(1);
+        const { data: listing, error: fetchError } = await supabaseAdmin
+            .from("listings")
+            .select("userId")
+            .eq("id", listingId)
+            .single();
 
-        if (listing.length === 0) {
+        if (fetchError || !listing) {
             return new Response(
                 JSON.stringify({ error: "Listing not found" }),
                 { status: 404 }
             );
         }
 
-        if (listing[0].userId !== session.user.id) {
+        if (listing.userId !== session.user.id) {
             return new Response(JSON.stringify({ error: "Forbidden" }), {
                 status: 403,
             });
@@ -124,25 +105,28 @@ export async function PUT(
         }
 
         // Update listing
-        const updatedListing = await db
-            .update(listings)
-            .set({
+        const { data: updatedListing, error } = await supabaseAdmin
+            .from("listings")
+            .update({
                 title,
                 description,
                 price: price.toString(),
                 address,
-                moveIn: new Date(moveIn),
-                moveOut: new Date(moveOut),
+                moveIn,
+                moveOut,
                 bedrooms,
                 bathrooms,
                 image: image || null,
                 amenities: amenities || [],
-                updatedAt: new Date(),
+                updatedAt: new Date().toISOString(),
             })
-            .where(eq(listings.id, listingId))
-            .returning();
+            .eq("id", listingId)
+            .select()
+            .single();
 
-        return new Response(JSON.stringify(updatedListing[0]), {
+        if (error) throw error;
+
+        return new Response(JSON.stringify(updatedListing), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });
@@ -174,27 +158,32 @@ export async function DELETE(
         }
 
         // Check if user owns the listing
-        const listing = await db
-            .select()
-            .from(listings)
-            .where(eq(listings.id, listingId))
-            .limit(1);
+        const { data: listing, error: fetchError } = await supabaseAdmin
+            .from("listings")
+            .select("userId")
+            .eq("id", listingId)
+            .single();
 
-        if (listing.length === 0) {
+        if (fetchError || !listing) {
             return new Response(
                 JSON.stringify({ error: "Listing not found" }),
                 { status: 404 }
             );
         }
 
-        if (listing[0].userId !== session.user.id) {
+        if (listing.userId !== session.user.id) {
             return new Response(JSON.stringify({ error: "Forbidden" }), {
                 status: 403,
             });
         }
 
         // Delete listing
-        await db.delete(listings).where(eq(listings.id, listingId));
+        const { error } = await supabaseAdmin
+            .from("listings")
+            .delete()
+            .eq("id", listingId);
+
+        if (error) throw error;
 
         return new Response(JSON.stringify({ success: true }), {
             status: 200,

@@ -1,8 +1,6 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { notifications } from "@/lib/db/schema";
+import { supabaseAdmin } from "@/lib/supabase";
 import { headers } from "next/headers";
-import { eq } from "drizzle-orm";
 
 export async function GET(request: Request) {
     try {
@@ -16,10 +14,12 @@ export async function GET(request: Request) {
             });
         }
 
-        const userNotifications = await db
-            .select()
-            .from(notifications)
-            .where(eq(notifications.userId, session.user.id));
+        const { data: userNotifications, error } = await supabaseAdmin
+            .from("notifications")
+            .select("*")
+            .eq("userId", session.user.id);
+
+        if (error) throw error;
 
         return new Response(JSON.stringify(userNotifications), {
             status: 200,
@@ -56,18 +56,23 @@ export async function POST(request: Request) {
             );
         }
 
-        const newNotification = await db
-            .insert(notifications)
-            .values({
-                userId: session.user.id,
-                type,
-                title,
-                description,
-                relatedId,
-            })
-            .returning();
+        const { data: newNotification, error } = await supabaseAdmin
+            .from("notifications")
+            .insert([
+                {
+                    userId: session.user.id,
+                    type,
+                    title,
+                    description,
+                    relatedId,
+                },
+            ])
+            .select()
+            .single();
 
-        return new Response(JSON.stringify(newNotification[0]), {
+        if (error) throw error;
+
+        return new Response(JSON.stringify(newNotification), {
             status: 201,
             headers: { "Content-Type": "application/json" },
         });

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 
 export default function PostListingPage() {
     const router = useRouter();
@@ -46,8 +46,8 @@ export default function PostListingPage() {
     useEffect(() => {
         async function checkAuth() {
             try {
-                const session = await authClient.getSession();
-                if (!session?.data?.user) {
+                const { data } = await getSession();
+                if (!data?.session?.user) {
                     router.push("/auth");
                     return;
                 }

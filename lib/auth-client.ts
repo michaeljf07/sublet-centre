@@ -1,17 +1,28 @@
-import { createAuthClient } from "better-auth/react";
-
-export const authClient = createAuthClient({
-    baseURL: "http://localhost:3000",
-});
+import { supabaseAuth } from "./auth";
 
 export const signIn = async (email: string, password: string) => {
-    return authClient.signIn.email({ email, password });
+    return supabaseAuth.auth.signInWithPassword({
+        email,
+        password,
+    });
 };
 
 export const signUp = async (email: string, password: string, name: string) => {
-    return authClient.signUp.email({ email, password, name });
+    return supabaseAuth.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                name,
+            },
+        },
+    });
 };
 
 export const signOut = async () => {
-    return authClient.signOut();
+    return supabaseAuth.auth.signOut();
+};
+
+export const getSession = async () => {
+    return supabaseAuth.auth.getSession();
 };

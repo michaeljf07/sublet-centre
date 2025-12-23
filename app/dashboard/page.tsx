@@ -7,7 +7,7 @@ import Footer from "@/components/layout/Footer";
 import { UserListings } from "@/components/dashboard/UserListings";
 import { FavoritedListings } from "@/components/dashboard/FavoritedListings";
 import { AccountInformation } from "@/components/dashboard/AccountInformation";
-import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import { useFavorites } from "@/lib/favorites-context";
 import { Listing } from "@/types";
 
@@ -26,8 +26,8 @@ export default function DashboardPage() {
     useEffect(() => {
         async function checkAuth() {
             try {
-                const session = await authClient.getSession();
-                if (!session?.data?.user) {
+                const { data } = await getSession();
+                if (!data?.session?.user) {
                     router.push("/auth");
                     return;
                 }

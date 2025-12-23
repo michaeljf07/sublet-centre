@@ -1,8 +1,6 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { notifications } from "@/lib/db/schema";
+import { supabaseAdmin } from "@/lib/supabase";
 import { headers } from "next/headers";
-import { eq, and } from "drizzle-orm";
 
 export async function DELETE(
     request: Request,
@@ -22,17 +20,14 @@ export async function DELETE(
         const notificationId = parseInt(params.id);
 
         // Verify the notification belongs to the user
-        const notification = await db
-            .select()
-            .from(notifications)
-            .where(
-                and(
-                    eq(notifications.id, notificationId),
-                    eq(notifications.userId, session.user.id)
-                )
-            );
+        const { data: notification, error: fetchError } = await supabaseAdmin
+            .from("notifications")
+            .select("*")
+            .eq("id", notificationId)
+            .eq("userId", session.user.id)
+            .single();
 
-        if (notification.length === 0) {
+        if (fetchError || !notification) {
             return new Response(
                 JSON.stringify({ error: "Notification not found" }),
                 { status: 404 }
@@ -40,14 +35,11 @@ export async function DELETE(
         }
 
         // Delete the notification
-        await db
-            .delete(notifications)
-            .where(
-                and(
-                    eq(notifications.id, notificationId),
-                    eq(notifications.userId, session.user.id)
-                )
-            );
+        const { error } = await supabaseAdmin
+            .from("notifications")
+            .delete()
+            .eq("id", notificationId)
+            .eq("userId", session.user.id);
 
         return new Response(JSON.stringify({ success: true }), {
             status: 200,

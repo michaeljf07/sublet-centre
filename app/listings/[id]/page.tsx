@@ -7,7 +7,7 @@ import Footer from "@/components/layout/Footer";
 import { Listing } from "@/types";
 import { Heart, MapPin, Bed, Bath, Send } from "lucide-react";
 import { useFavorites } from "@/lib/favorites-context";
-import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import Link from "next/link";
 
 function formatDate(date: string | Date): string {
@@ -39,8 +39,8 @@ export default function ListingDetailPage() {
     useEffect(() => {
         async function checkAuth() {
             try {
-                const session = await authClient.getSession();
-                setUser(session?.data?.user || null);
+                const { data } = await getSession();
+                setUser(data?.session?.user || null);
             } catch (error) {
                 console.error("Auth check failed:", error);
             }

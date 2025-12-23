@@ -1,8 +1,6 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { messages, listings, notifications } from "@/lib/db/schema";
+import { supabaseAdmin } from "@/lib/supabase";
 import { headers } from "next/headers";
-import { eq, or, and } from "drizzle-orm";
 
 export async function POST(request: Request) {
     try {
@@ -27,13 +25,13 @@ export async function POST(request: Request) {
         }
 
         // Get the listing to find the recipient
-        const listing = await db
-            .select()
-            .from(listings)
-            .where(eq(listings.id, parseInt(listingId)))
-            .limit(1);
+        const { data: listing, error: listingError } = await supabaseAdmin
+            .from("listings")
+            .select("userId, title")
+            .eq("id", parseInt(listingId))
+            .single();
 
-        if (listing.length === 0) {
+        if (listingError || !listing) {
             return new Response(
                 JSON.stringify({ error: "Listing not found" }),
                 { status: 404 }
@@ -41,26 +39,33 @@ export async function POST(request: Request) {
         }
 
         // Create the message
-        const newMessage = await db
-            .insert(messages)
-            .values({
-                senderId: session.user.id,
-                recipientId: listing[0].userId,
-                listingId: parseInt(listingId),
-                content,
-            })
-            .returning();
+        const { data: newMessage, error: messageError } = await supabaseAdmin
+            .from("messages")
+            .insert([
+                {
+                    senderId: session.user.id,
+                    recipientId: listing.userId,
+                    listingId: parseInt(listingId),
+                    content,
+                },
+            ])
+            .select()
+            .single();
+
+        if (messageError) throw messageError;
 
         // Create a notification for the recipient
-        await db.insert(notifications).values({
-            userId: listing[0].userId,
-            type: "message",
-            title: "New Message",
-            description: `You have a new message about "${listing[0].title}"`,
-            relatedId: newMessage[0].id,
-        });
+        await supabaseAdmin.from("notifications").insert([
+            {
+                userId: listing.userId,
+                type: "message",
+                title: "New Message",
+                description: `You have a new message about "${listing.title}"`,
+                relatedId: newMessage.id,
+            },
+        ]);
 
-        return new Response(JSON.stringify(newMessage[0]), {
+        return new Response(JSON.stringify(newMessage), {
             status: 201,
             headers: { "Content-Type": "application/json" },
         });
@@ -89,35 +94,22 @@ export async function GET(request: Request) {
         const conversationUserId = searchParams.get("userId");
 
         // Get messages between the current user and the specified user
-        let userMessages;
+        let query = supabaseAdmin.from("messages").select("*");
+
         if (conversationUserId) {
-            userMessages = await db
-                .select()
-                .from(messages)
-                .where(
-                    or(
-                        and(
-                            eq(messages.senderId, session.user.id),
-                            eq(messages.recipientId, conversationUserId)
-                        ),
-                        and(
-                            eq(messages.senderId, conversationUserId),
-                            eq(messages.recipientId, session.user.id)
-                        )
-                    )
-                );
+            query = query.or(
+                `and(senderId.eq.${session.user.id},recipientId.eq.${conversationUserId}),` +
+                    `and(senderId.eq.${conversationUserId},recipientId.eq.${session.user.id})`
+            );
         } else {
-            // Get all messages where user is either sender or recipient
-            userMessages = await db
-                .select()
-                .from(messages)
-                .where(
-                    or(
-                        eq(messages.senderId, session.user.id),
-                        eq(messages.recipientId, session.user.id)
-                    )
-                );
+            query = query.or(
+                `senderId.eq.${session.user.id},recipientId.eq.${session.user.id}`
+            );
         }
+
+        const { data: userMessages, error } = await query;
+
+        if (error) throw error;
 
         return new Response(JSON.stringify(userMessages), {
             status: 200,

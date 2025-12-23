@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Listing } from "@/types";
 import { useFavorites } from "@/lib/favorites-context";
-import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 
 interface ListingCardProps {
     listing: Listing;
@@ -37,8 +37,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const session = await authClient.getSession();
-                setIsAuthenticated(!!session?.data?.user);
+                const { data } = await getSession();
+                setIsAuthenticated(!!data?.session?.user);
             } catch (error) {
                 setIsAuthenticated(false);
             } finally {

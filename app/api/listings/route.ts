@@ -1,59 +1,21 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { listings } from "@/lib/db/schema";
+import { supabaseAdmin } from "@/lib/supabase";
 import { headers } from "next/headers";
-import { eq } from "drizzle-orm";
-import { sql } from "drizzle-orm";
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const userId = searchParams.get("userId");
 
-        let allListings;
+        let query = supabaseAdmin.from("listings").select("*");
 
         if (userId) {
-            allListings = await db
-                .select({
-                    id: listings.id,
-                    userId: listings.userId,
-                    title: listings.title,
-                    description: listings.description,
-                    price: listings.price,
-                    address: listings.address,
-                    moveIn: listings.moveIn,
-                    moveOut: listings.moveOut,
-                    bedrooms: listings.bedrooms,
-                    bathrooms: listings.bathrooms,
-                    image: listings.image,
-                    amenities: listings.amenities,
-                    createdAt: listings.createdAt,
-                    updatedAt: listings.updatedAt,
-                    posterName: sql<string>`(SELECT name FROM "user" WHERE "user".id = ${listings.userId})`,
-                })
-                .from(listings)
-                .where(eq(listings.userId, userId));
-        } else {
-            allListings = await db
-                .select({
-                    id: listings.id,
-                    userId: listings.userId,
-                    title: listings.title,
-                    description: listings.description,
-                    price: listings.price,
-                    address: listings.address,
-                    moveIn: listings.moveIn,
-                    moveOut: listings.moveOut,
-                    bedrooms: listings.bedrooms,
-                    bathrooms: listings.bathrooms,
-                    image: listings.image,
-                    amenities: listings.amenities,
-                    createdAt: listings.createdAt,
-                    updatedAt: listings.updatedAt,
-                    posterName: sql<string>`(SELECT name FROM "user" WHERE "user".id = ${listings.userId})`,
-                })
-                .from(listings);
+            query = query.eq("userId", userId);
         }
+
+        const { data: allListings, error } = await query;
+
+        if (error) throw error;
 
         return new Response(JSON.stringify(allListings), {
             status: 200,
@@ -111,25 +73,29 @@ export async function POST(request: Request) {
             );
         }
 
-        // Create listing in database
-        const newListing = await db
-            .insert(listings)
-            .values({
-                userId: session.user.id,
-                title,
-                description,
-                price: price.toString(),
-                address,
-                moveIn: new Date(moveIn),
-                moveOut: new Date(moveOut),
-                bedrooms,
-                bathrooms,
-                image: image || null,
-                amenities: amenities || [],
-            })
-            .returning();
+        const { data: newListing, error } = await supabaseAdmin
+            .from("listings")
+            .insert([
+                {
+                    userId: session.user.id,
+                    title,
+                    description,
+                    price: price.toString(),
+                    address,
+                    moveIn,
+                    moveOut,
+                    bedrooms,
+                    bathrooms,
+                    image: image || null,
+                    amenities: amenities || [],
+                },
+            ])
+            .select()
+            .single();
 
-        return new Response(JSON.stringify(newListing[0]), {
+        if (error) throw error;
+
+        return new Response(JSON.stringify(newListing), {
             status: 201,
             headers: { "Content-Type": "application/json" },
         });
