@@ -24,7 +24,7 @@ export async function DELETE(
             .from("notifications")
             .select("*")
             .eq("id", notificationId)
-            .eq("userId", session.user.id)
+            .eq("user_id", session.user.id)
             .single();
 
         if (fetchError || !notification) {
@@ -39,7 +39,7 @@ export async function DELETE(
             .from("notifications")
             .delete()
             .eq("id", notificationId)
-            .eq("userId", session.user.id);
+            .eq("user_id", session.user.id);
 
         return new Response(JSON.stringify({ success: true }), {
             status: 200,

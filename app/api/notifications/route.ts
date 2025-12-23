@@ -4,8 +4,9 @@ import { headers } from "next/headers";
 
 export async function GET(request: Request) {
     try {
+        const requestHeaders = await headers();
         const session = await auth.api.getSession({
-            headers: await headers(),
+            headers: requestHeaders,
         });
 
         if (!session?.user) {
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
         const { data: userNotifications, error } = await supabaseAdmin
             .from("notifications")
             .select("*")
-            .eq("userId", session.user.id);
+            .eq("user_id", session.user.id);
 
         if (error) throw error;
 

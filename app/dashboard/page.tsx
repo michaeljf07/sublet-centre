@@ -31,7 +31,7 @@ export default function DashboardPage() {
                     router.push("/auth");
                     return;
                 }
-                setUser(session.data.user);
+                setUser(data.session.user);
 
                 // Fetch all listings first
                 const allListingsResponse = await fetch("/api/listings");
@@ -59,7 +59,7 @@ export default function DashboardPage() {
 
                 // Fetch user's own listings
                 const listingsResponse = await fetch(
-                    `/api/listings?userId=${session.data.user.id}`
+                    `/api/listings?userId=${data.session.user.id}`
                 );
                 if (listingsResponse.ok) {
                     const data = await listingsResponse.json();
@@ -70,14 +70,14 @@ export default function DashboardPage() {
                             description: listing.description,
                             price: parseFloat(listing.price),
                             address: listing.address,
-                            moveIn: listing.moveIn,
-                            moveOut: listing.moveOut,
+                            moveIn: listing.move_in,
+                            moveOut: listing.move_out,
                             bedrooms: listing.bedrooms,
                             bathrooms: listing.bathrooms,
                             image: listing.image,
                             amenities: listing.amenities || [],
                             distance: "TBD",
-                            poster: listing.posterName || "You",
+                            poster: listing.poster_name || "You",
                         })
                     );
                     setUserListings(transformedListings);
@@ -126,7 +126,7 @@ export default function DashboardPage() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
                 <div className="mb-6 md:mb-8">
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        Welcome, {user.name || user.email}!
+                        Welcome, {user.user_metadata?.name || user.email}!
                     </h1>
                     <p className="mt-2 text-gray-600 text-sm md:text-base">
                         Manage your listings, favorites, and account settings

@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error("Missing Supabase environment variables");
@@ -9,24 +10,42 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
 
+// Create admin client with service role key for server-side auth validation
+const supabaseAdminAuth = createClient(
+    supabaseUrl,
+    supabaseServiceRoleKey || supabaseAnonKey
+);
+
 // Helper for API routes to get session from headers
 export const auth = {
     api: {
         async getSession({ headers }: { headers: Headers }) {
             try {
-                const authHeader = headers.get("Authorization");
-                if (!authHeader) return null;
+                const authHeader =
+                    headers.get("Authorization") ||
+                    headers.get("authorization");
+                if (!authHeader) {
+                    return null;
+                }
 
                 const token = authHeader.replace("Bearer ", "");
-                const { data, error } = await supabaseAuth.auth.getUser(token);
+                const { data, error } = await supabaseAdminAuth.auth.getUser(
+                    token
+                );
 
-                if (error || !data.user) return null;
+                if (error) {
+                    return null;
+                }
+
+                if (!data.user) {
+                    return null;
+                }
 
                 return {
                     user: data.user,
                     session: { user: data.user },
                 };
-            } catch {
+            } catch (error) {
                 return null;
             }
         },

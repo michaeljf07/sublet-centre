@@ -35,14 +35,14 @@ export default function Home() {
                         description: listing.description,
                         price: parseFloat(listing.price),
                         address: listing.address,
-                        moveIn: listing.moveIn,
-                        moveOut: listing.moveOut,
+                        moveIn: listing.move_in,
+                        moveOut: listing.move_out,
                         bedrooms: listing.bedrooms,
                         bathrooms: listing.bathrooms,
                         image: listing.image,
                         amenities: listing.amenities || [],
                         distance: "TBD", // fix later with real distance calculation
-                        poster: listing.posterName || "User",
+                        poster: listing.poster_name || "User",
                     })
                 );
 
@@ -80,7 +80,6 @@ export default function Home() {
 
     const handleSearch = () => {
         setSearchTerm(inputValue);
-        console.log("Searching for:", inputValue);
     };
 
     return (

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { getSession } from "@/lib/auth-client";
+import { getSession, getAuthToken } from "@/lib/auth-client";
 
 export default function PostListingPage() {
     const router = useRouter();
@@ -62,12 +62,12 @@ export default function PostListingPage() {
                     const listing = await response.json();
 
                     // Format dates for input fields
-                    const moveInDate = new Date(listing.moveIn)
-                        .toISOString()
-                        .split("T")[0];
-                    const moveOutDate = new Date(listing.moveOut)
-                        .toISOString()
-                        .split("T")[0];
+                    const moveInDate = listing.moveIn
+                        ? new Date(listing.moveIn).toISOString().split("T")[0]
+                        : "";
+                    const moveOutDate = listing.moveOut
+                        ? new Date(listing.moveOut).toISOString().split("T")[0]
+                        : "";
 
                     setFormData({
                         title: listing.title,
@@ -154,12 +154,25 @@ export default function PostListingPage() {
                 bathrooms: parseInt(formData.bathrooms),
             };
 
+            let token = await getAuthToken();
+
+            if (!token) {
+                const sessionResult = await getSession();
+                token = sessionResult?.data?.session?.access_token;
+                if (!token) {
+                    throw new Error("Not authenticated - please sign in again");
+                }
+            }
+
             const url = editId ? `/api/listings/${editId}` : "/api/listings";
             const method = editId ? "PUT" : "POST";
 
             const response = await fetch(url, {
                 method,
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify(listingData),
             });
 

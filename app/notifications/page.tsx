@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { getSession } from "@/lib/auth-client";
+import { getSession, getAuthToken } from "@/lib/auth-client";
 import { Bell, Trash2 } from "lucide-react";
 
 interface Notification {
@@ -32,10 +32,15 @@ export default function NotificationsPage() {
                     router.push("/auth");
                     return;
                 }
-                setUser(session.data.user);
+                setUser(data.session.user);
 
                 // Fetch notifications
-                const response = await fetch("/api/notifications");
+                const token = await getAuthToken();
+                const response = await fetch("/api/notifications", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setNotifications(data);

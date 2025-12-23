@@ -10,12 +10,18 @@ interface ListingCardProps {
     onSelect: (listing: Listing) => void;
 }
 
-function formatDate(date: string | Date): string {
+function formatDate(date: string | Date | null | undefined): string {
+    if (!date) {
+        return "TBD";
+    }
     let dateObj: Date;
     if (typeof date === "string") {
         dateObj = new Date(date);
     } else {
         dateObj = date;
+    }
+    if (isNaN(dateObj.getTime())) {
+        return "TBD";
     }
     return dateObj.toLocaleDateString("en-US", {
         year: "numeric",

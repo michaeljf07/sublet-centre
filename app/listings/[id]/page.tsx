@@ -7,15 +7,21 @@ import Footer from "@/components/layout/Footer";
 import { Listing } from "@/types";
 import { Heart, MapPin, Bed, Bath, Send } from "lucide-react";
 import { useFavorites } from "@/lib/favorites-context";
-import { getSession } from "@/lib/auth-client";
+import { getSession, getAuthToken } from "@/lib/auth-client";
 import Link from "next/link";
 
-function formatDate(date: string | Date): string {
+function formatDate(date: string | Date | null | undefined): string {
+    if (!date) {
+        return "TBD";
+    }
     let dateObj: Date;
     if (typeof date === "string") {
         dateObj = new Date(date);
     } else {
         dateObj = date;
+    }
+    if (isNaN(dateObj.getTime())) {
+        return "TBD";
     }
     return dateObj.toLocaleDateString("en-US", {
         year: "numeric",
@@ -93,10 +99,12 @@ export default function ListingDetailPage() {
 
         try {
             setSending(true);
+            const token = await getAuthToken();
             const response = await fetch("/api/messages", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     recipientId: listing?.id,

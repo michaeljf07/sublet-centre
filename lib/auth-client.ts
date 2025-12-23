@@ -1,4 +1,10 @@
 import { supabaseAuth } from "./auth";
+import { supabaseClient } from "./supabase";
+
+// Make sure supabase auth is using proper session storage on client
+if (typeof window !== "undefined") {
+    // Session is already persisted by default in Supabase
+}
 
 export const signIn = async (email: string, password: string) => {
     return supabaseAuth.auth.signInWithPassword({
@@ -24,5 +30,10 @@ export const signOut = async () => {
 };
 
 export const getSession = async () => {
-    return supabaseAuth.auth.getSession();
+    return supabaseClient.auth.getSession();
+};
+
+export const getAuthToken = async () => {
+    const { data } = await supabaseClient.auth.getSession();
+    return data?.session?.access_token;
 };

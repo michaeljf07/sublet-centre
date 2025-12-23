@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Home, Bell, User, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { signOut, getSession } from "@/lib/auth-client";
+import { signOut, getSession, getAuthToken } from "@/lib/auth-client";
 
 export const Header = () => {
     const [isSigningOut, setIsSigningOut] = useState(false);
@@ -22,8 +22,17 @@ export const Header = () => {
                 setIsAuthenticated(!!data?.session?.user);
 
                 if (data?.session?.user) {
-                    // Fetch notifications
-                    const response = await fetch("/api/notifications");
+                    // Fetch notifications with auth token
+                    const token = await getAuthToken();
+                    const headers: HeadersInit = {
+                        "Content-Type": "application/json",
+                    };
+                    if (token) {
+                        headers["Authorization"] = `Bearer ${token}`;
+                    }
+                    const response = await fetch("/api/notifications", {
+                        headers,
+                    });
                     if (response.ok) {
                         const notificationData = await response.json();
                         const unread = notificationData.filter(

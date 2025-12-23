@@ -10,7 +10,7 @@ export async function GET(request: Request) {
         let query = supabaseAdmin.from("listings").select("*");
 
         if (userId) {
-            query = query.eq("userId", userId);
+            query = query.eq("user_id", userId);
         }
 
         const { data: allListings, error } = await query;
@@ -32,8 +32,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
+        const requestHeaders = await headers();
         const session = await auth.api.getSession({
-            headers: await headers(),
+            headers: requestHeaders,
         });
 
         if (!session?.user) {
@@ -77,13 +78,13 @@ export async function POST(request: Request) {
             .from("listings")
             .insert([
                 {
-                    userId: session.user.id,
+                    user_id: session.user.id,
                     title,
                     description,
                     price: price.toString(),
                     address,
-                    moveIn,
-                    moveOut,
+                    move_in: moveIn,
+                    move_out: moveOut,
                     bedrooms,
                     bathrooms,
                     image: image || null,

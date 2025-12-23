@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { getSession } from "@/lib/auth-client";
+import { getSession, getAuthToken } from "@/lib/auth-client";
 import { Send } from "lucide-react";
 
 interface Message {
@@ -29,10 +29,15 @@ export default function MessagesPage() {
                     router.push("/auth");
                     return;
                 }
-                setUser(session.data.user);
+                setUser(data.session.user);
 
                 // Fetch messages
-                const response = await fetch("/api/messages");
+                const token = await getAuthToken();
+                const response = await fetch("/api/messages", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setMessages(data);
