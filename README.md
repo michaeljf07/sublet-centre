@@ -23,8 +23,8 @@ A modern web application for finding and posting rental sublets made for student
 
 -   **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
 -   **Backend**: Next.js API Routes
--   **Database**: Local PostgreSQL (Configure your database in `.env.local`)
--   **Authentication**: Better-Auth
+-   **Database**: PostgresSQL, Drizzle ORM, Supabase
+-   **Authentication**: Supabase Auth
 -   **Icons**: Lucide React
 
 ## Project Structure
@@ -68,10 +68,6 @@ sublet-centre/
 
 -   `GET /api/notifications` - Get all notifications
 -   `DELETE /api/notifications/[id]` - Delete a notification
-
-### Authentication
-
--   `POST /api/auth/[...all]` - Better-Auth endpoints
 
 ## Usage
 
