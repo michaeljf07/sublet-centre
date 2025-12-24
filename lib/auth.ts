@@ -10,13 +10,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
 
-// Create admin client with service role key for server-side auth validation
 const supabaseAdminAuth = createClient(
     supabaseUrl,
     supabaseServiceRoleKey || supabaseAnonKey
 );
 
-// Helper for API routes to get session from headers
+// Helper to for API route authentication
 export const auth = {
     api: {
         async getSession({ headers }: { headers: Headers }) {

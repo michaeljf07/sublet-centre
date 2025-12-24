@@ -41,7 +41,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
     const router = useRouter();
 
     useEffect(() => {
-        const checkAuth = async () => {
+        async function checkAuth() {
             try {
                 const { data } = await getSession();
                 setIsAuthenticated(!!data?.session?.user);
@@ -50,12 +50,12 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             } finally {
                 setIsCheckingAuth(false);
             }
-        };
+        }
 
         checkAuth();
     }, []);
 
-    const handleFavoriteClick = (e: React.MouseEvent) => {
+    function handleFavoriteClick(e: React.MouseEvent) {
         e.stopPropagation();
 
         if (!isAuthenticated) {
@@ -64,11 +64,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         }
 
         toggleFavorite(listing.id);
-    };
+    }
 
-    const handleCardClick = () => {
+    function handleCardClick() {
         router.push(`/listings/${listing.id}`);
-    };
+    }
 
     return (
         <div

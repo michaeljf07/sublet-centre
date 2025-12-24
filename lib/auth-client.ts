@@ -1,11 +1,6 @@
 import { supabaseAuth } from "./auth";
 import { supabaseClient } from "./supabase";
 
-// Make sure supabase auth is using proper session storage on client
-if (typeof window !== "undefined") {
-    // Session is already persisted by default in Supabase
-}
-
 export const signIn = async (email: string, password: string) => {
     return supabaseAuth.auth.signInWithPassword({
         email,

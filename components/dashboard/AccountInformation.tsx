@@ -10,10 +10,10 @@ interface AccountInformationProps {
 }
 
 export function AccountInformation({ user }: AccountInformationProps) {
-    const handleSignOut = async () => {
+    async function handleSignOut() {
         await signOut();
         window.location.href = "/";
-    };
+    }
 
     return (
         <div className="bg-white rounded-lg shadow overflow-hidden">

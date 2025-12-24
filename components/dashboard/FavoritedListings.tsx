@@ -13,10 +13,10 @@ export function FavoritedListings({
 }: FavoritedListingsProps) {
     const { toggleFavorite } = useFavorites();
 
-    const handleRemove = (id: number) => {
+    function handleRemove(id: number) {
         toggleFavorite(id);
         onRemove(id);
-    };
+    }
 
     if (listings.length === 0) {
         return (
