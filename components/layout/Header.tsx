@@ -16,13 +16,12 @@ export const Header = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const checkAuth = async () => {
+        async function checkAuth() {
             try {
                 const { data } = await getSession();
                 setIsAuthenticated(!!data?.session?.user);
 
                 if (data?.session?.user) {
-                    // Fetch notifications with auth token
                     const token = await getAuthToken();
                     const headers: HeadersInit = {
                         "Content-Type": "application/json",
@@ -46,20 +45,20 @@ export const Header = () => {
             } finally {
                 setIsLoading(false);
             }
-        };
+        }
 
         checkAuth();
 
         // Re-check auth when window regains focus
-        const handleFocus = () => {
+        function handleFocus() {
             checkAuth();
-        };
+        }
 
         window.addEventListener("focus", handleFocus);
         return () => window.removeEventListener("focus", handleFocus);
     }, []);
 
-    const handleSignOut = async () => {
+    async function handleSignOut() {
         setIsSigningOut(true);
         try {
             await signOut();
@@ -70,7 +69,7 @@ export const Header = () => {
         } finally {
             setIsSigningOut(false);
         }
-    };
+    }
 
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50">

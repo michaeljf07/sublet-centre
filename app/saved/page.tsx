@@ -17,7 +17,7 @@ export default function SavedPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchListings = async () => {
+        async function fetchListings() {
             try {
                 setLoading(true);
                 const response = await fetch("/api/listings");
@@ -54,7 +54,7 @@ export default function SavedPage() {
             } finally {
                 setLoading(false);
             }
-        };
+        }
 
         fetchListings();
     }, []);
