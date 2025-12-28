@@ -6,6 +6,7 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const userId = searchParams.get("userId");
+        const searchTerm = searchParams.get("search");
 
         let query = supabaseAdmin.from("listings").select("*");
 
@@ -16,6 +17,30 @@ export async function GET(request: Request) {
         const { data: allListings, error } = await query;
 
         if (error) throw error;
+
+        // Server-side search if search term provided
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            const filtered = allListings?.filter((listing: any) => {
+                const searchableText = [
+                    listing.title,
+                    listing.description,
+                    listing.address,
+                    listing.search_terms,
+                    ...(Array.isArray(listing.amenities) ? listing.amenities : []),
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                return searchableText.includes(term);
+            }) || [];
+
+            return new Response(JSON.stringify(filtered), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
+        }
 
         return new Response(JSON.stringify(allListings), {
             status: 200,
@@ -56,6 +81,7 @@ export async function POST(request: Request) {
             bathrooms,
             image,
             amenities,
+            search_terms: providedSearchTerms,
         } = body;
 
         if (
@@ -79,6 +105,13 @@ export async function POST(request: Request) {
             session.user.email?.split("@")[0] ||
             "User";
 
+        // Create search terms from provided value or generate from title, description, address, and amenities
+        const searchTerms =
+            providedSearchTerms ||
+            [title, description, address, ...(amenities || [])]
+                .join(" ")
+                .toLowerCase();
+
         const { data: newListing, error } = await supabaseAdmin
             .from("listings")
             .insert([
@@ -95,6 +128,7 @@ export async function POST(request: Request) {
                     image: image || null,
                     amenities: amenities || [],
                     poster_name: poster_name,
+                    search_terms: searchTerms,
                 },
             ])
             .select()

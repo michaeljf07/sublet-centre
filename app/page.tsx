@@ -16,12 +16,17 @@ export default function Home() {
     const [listings, setListings] = useState<Listing[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [sortBy, setSortBy] = useState<string>("most-recent");
 
     useEffect(() => {
-        const fetchListings = async () => {
+        async function fetchListings() {
             try {
                 setLoading(true);
-                const response = await fetch("/api/listings");
+                const url = new URL("/api/listings", window.location.origin);
+                if (searchTerm.trim()) {
+                    url.searchParams.set("search", searchTerm);
+                }
+                const response = await fetch(url.toString());
                 if (!response.ok) {
                     throw new Error("Failed to fetch listings");
                 }
@@ -55,32 +60,40 @@ export default function Home() {
             } finally {
                 setLoading(false);
             }
-        };
-
-        fetchListings();
-    }, []);
-
-    // Filter listings based on search term
-    const filteredListings = useMemo(() => {
-        if (!searchTerm.trim()) {
-            return listings;
         }
 
-        const term = searchTerm.toLowerCase();
-        return listings.filter(
-            (listing) =>
-                listing.title.toLowerCase().includes(term) ||
-                listing.description.toLowerCase().includes(term) ||
-                listing.address.toLowerCase().includes(term) ||
-                listing.amenities.some((amenity) =>
-                    amenity.toLowerCase().includes(term)
-                )
-        );
-    }, [searchTerm, listings]);
+        fetchListings();
+    }, [searchTerm]);
 
-    const handleSearch = () => {
+    // Filter listings based on search term inputted by user (typed)
+    const filteredListings = useMemo(() => {
+        return listings;
+    }, [listings]);
+
+    // Sort listings based on the filter on browsing page
+    const sortedListings = useMemo(() => {
+        const listingsToSort = [...filteredListings];
+
+        switch (sortBy) {
+            case "price-low-to-high":
+                return listingsToSort.sort((a, b) => a.price - b.price);
+            case "price-high-to-low":
+                return listingsToSort.sort((a, b) => b.price - a.price);
+            case "move-in-date":
+                return listingsToSort.sort((a, b) => {
+                    const dateA = new Date(a.moveIn || 0).getTime();
+                    const dateB = new Date(b.moveIn || 0).getTime();
+                    return dateA - dateB;
+                });
+            case "most-recent":
+            default:
+                return listingsToSort;
+        }
+    }, [filteredListings, sortBy]);
+
+    function handleSearch() {
         setSearchTerm(inputValue);
-    };
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -104,8 +117,10 @@ export default function Home() {
                 </div>
             ) : filteredListings.length > 0 ? (
                 <ListingGrid
-                    listings={filteredListings}
+                    listings={sortedListings}
                     onSelectListing={setSelectedListing}
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
                 />
             ) : (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
