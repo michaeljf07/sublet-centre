@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import { useState } from "react";
 
 interface HeroProps {
     searchTerm: string;
@@ -11,6 +12,20 @@ export const Hero: React.FC<HeroProps> = ({
     onSearchChange,
     onSearch,
 }) => {
+    const [selectedTerm, setSelectedTerm] = useState<string>("All Terms");
+
+    const handleTermChange = (term: string) => {
+        setSelectedTerm(term);
+        if (term !== "All Terms") {
+            onSearchChange(term);
+            // Trigger search immediately when a term is selected
+            setTimeout(() => {
+                onSearch();
+            }, 0);
+        } else {
+            onSearchChange("");
+        }
+    };
     return (
         <div className="bg-linear-to-r from-blue-600 to-blue-800 text-white py-12 md:py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,12 +49,22 @@ export const Hero: React.FC<HeroProps> = ({
                                     onChange={(e) =>
                                         onSearchChange(e.target.value)
                                     }
+                                    onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                            onSearch();
+                                        }
+                                    }}
                                 />
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3">
-                                <select className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500">
+                                <select
+                                    value={selectedTerm}
+                                    onChange={(e) =>
+                                        handleTermChange(e.target.value)
+                                    }
+                                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500">
                                     <option>All Terms</option>
-                                    <option>Summer 2026</option>
+                                    <option>Spring 2026</option>
                                     <option>Fall 2026</option>
                                     <option>Winter 2026</option>
                                 </select>
