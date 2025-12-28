@@ -4,7 +4,7 @@ import { useState } from "react";
 interface HeroProps {
     searchTerm: string;
     onSearchChange: (term: string) => void;
-    onSearch: () => void;
+    onSearch: (term?: string) => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -14,18 +14,16 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
     const [selectedTerm, setSelectedTerm] = useState<string>("All Terms");
 
-    const handleTermChange = (term: string) => {
+    function handleTermChange(term: string) {
         setSelectedTerm(term);
         if (term !== "All Terms") {
             onSearchChange(term);
-            // Trigger search immediately when a term is selected
-            setTimeout(() => {
-                onSearch();
-            }, 0);
+            onSearch(term);
         } else {
             onSearchChange("");
+            onSearch("");
         }
-    };
+    }
     return (
         <div className="bg-linear-to-r from-blue-600 to-blue-800 text-white py-12 md:py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,7 +67,7 @@ export const Hero: React.FC<HeroProps> = ({
                                     <option>Winter 2026</option>
                                 </select>
                                 <button
-                                    onClick={onSearch}
+                                    onClick={() => onSearch()}
                                     className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium hover:cursor-pointer transition">
                                     Search
                                 </button>
