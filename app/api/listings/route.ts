@@ -21,20 +21,23 @@ export async function GET(request: Request) {
         // Server-side search if search term provided
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
-            const filtered = allListings?.filter((listing: any) => {
-                const searchableText = [
-                    listing.title,
-                    listing.description,
-                    listing.address,
-                    listing.search_terms,
-                    ...(Array.isArray(listing.amenities) ? listing.amenities : []),
-                ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
+            const filtered =
+                allListings?.filter((listing: any) => {
+                    const searchableText = [
+                        listing.title,
+                        listing.description,
+                        listing.address,
+                        listing.search_terms,
+                        ...(Array.isArray(listing.amenities)
+                            ? listing.amenities
+                            : []),
+                    ]
+                        .filter(Boolean)
+                        .join(" ")
+                        .toLowerCase();
 
-                return searchableText.includes(term);
-            }) || [];
+                    return searchableText.includes(term);
+                }) || [];
 
             return new Response(JSON.stringify(filtered), {
                 status: 200,

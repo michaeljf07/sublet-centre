@@ -46,7 +46,9 @@ export const Hero: React.FC<HeroProps> = ({
                                     placeholder="Search by location or keyword..."
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     value={searchTerm}
-                                    onChange={(e) => onSearchChange(e.target.value)}
+                                    onChange={(e) =>
+                                        onSearchChange(e.target.value)
+                                    }
                                     onKeyPress={(e) => {
                                         if (e.key === "Enter") {
                                             onSearch();
@@ -55,9 +57,11 @@ export const Hero: React.FC<HeroProps> = ({
                                 />
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3">
-                                <select 
+                                <select
                                     value={selectedTerm}
-                                    onChange={(e) => handleTermChange(e.target.value)}
+                                    onChange={(e) =>
+                                        handleTermChange(e.target.value)
+                                    }
                                     className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500">
                                     <option>All Terms</option>
                                     <option>Spring 2026</option>
