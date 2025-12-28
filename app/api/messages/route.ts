@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         // Get the listing to find the recipient
         const { data: listing, error: listingError } = await supabaseAdmin
             .from("listings")
-            .select("userId, title")
+            .select("user_id, title")
             .eq("id", parseInt(listingId))
             .single();
 
@@ -38,14 +38,20 @@ export async function POST(request: Request) {
             );
         }
 
+        const senderName =
+            session.user.user_metadata?.name ||
+            session.user.email?.split("@")[0] ||
+            "User";
+
         // Create the message
         const { data: newMessage, error: messageError } = await supabaseAdmin
             .from("messages")
             .insert([
                 {
-                    senderId: session.user.id,
-                    recipientId: listing.userId,
-                    listingId: parseInt(listingId),
+                    sender_id: session.user.id,
+                    sender_name: senderName,
+                    recipient_id: listing.user_id,
+                    listing_id: parseInt(listingId),
                     content,
                 },
             ])
@@ -57,11 +63,11 @@ export async function POST(request: Request) {
         // Create a notification for the recipient
         await supabaseAdmin.from("notifications").insert([
             {
-                userId: listing.userId,
+                user_id: listing.user_id,
                 type: "message",
                 title: "New Message",
                 description: `You have a new message about "${listing.title}"`,
-                relatedId: newMessage.id,
+                related_id: newMessage.id,
             },
         ]);
 
@@ -98,12 +104,12 @@ export async function GET(request: Request) {
 
         if (conversationUserId) {
             query = query.or(
-                `and(senderId.eq.${session.user.id},recipientId.eq.${conversationUserId}),` +
-                    `and(senderId.eq.${conversationUserId},recipientId.eq.${session.user.id})`
+                `and(sender_id.eq.${session.user.id},recipient_id.eq.${conversationUserId}),` +
+                    `and(sender_id.eq.${conversationUserId},recipient_id.eq.${session.user.id})`
             );
         } else {
             query = query.or(
-                `senderId.eq.${session.user.id},recipientId.eq.${session.user.id}`
+                `sender_id.eq.${session.user.id},recipient_id.eq.${session.user.id}`
             );
         }
 

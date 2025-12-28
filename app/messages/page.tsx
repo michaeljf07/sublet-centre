@@ -9,10 +9,11 @@ import { Send } from "lucide-react";
 
 interface Message {
     id: number;
-    senderId: string;
-    recipientId: string;
+    sender_id: string;
+    sender_name: string;
+    recipient_id: string;
     content: string;
-    createdAt: string;
+    created_at: string;
 }
 
 export default function MessagesPage() {
@@ -78,7 +79,7 @@ export default function MessagesPage() {
     const conversations = new Map<string, Message>();
     messages.forEach((msg) => {
         const otherId =
-            msg.senderId === user.id ? msg.recipientId : msg.senderId;
+            msg.sender_id === user.id ? msg.recipient_id : msg.sender_id;
         if (
             !conversations.has(otherId) ||
             conversations.get(otherId)!.id < msg.id
@@ -111,7 +112,7 @@ export default function MessagesPage() {
                         {Array.from(conversations.entries()).map(
                             ([otherId, lastMsg]) => {
                                 const isUserSender =
-                                    lastMsg.senderId === user.id;
+                                    lastMsg.sender_id === user.id;
                                 return (
                                     <div
                                         key={otherId}
@@ -122,7 +123,7 @@ export default function MessagesPage() {
                                                     {isUserSender
                                                         ? "Message to "
                                                         : "Message from "}
-                                                    {otherId}
+                                                    {lastMsg.sender_name}
                                                 </h3>
                                                 <p className="text-gray-600 mt-1">
                                                     {lastMsg.content.substring(
@@ -137,7 +138,7 @@ export default function MessagesPage() {
                                             </div>
                                             <span className="text-sm text-gray-500">
                                                 {new Date(
-                                                    lastMsg.createdAt
+                                                    lastMsg.created_at
                                                 ).toLocaleDateString()}
                                             </span>
                                         </div>

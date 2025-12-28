@@ -70,14 +70,14 @@ export default function ListingDetailPage() {
                     description: data.description,
                     price: parseFloat(data.price),
                     address: data.address,
-                    moveIn: data.moveIn,
-                    moveOut: data.moveOut,
+                    moveIn: data.move_in,
+                    moveOut: data.move_out,
                     bedrooms: data.bedrooms,
                     bathrooms: data.bathrooms,
                     image: data.image,
                     amenities: data.amenities || [],
                     distance: "TBD",
-                    poster: data.posterName || "User",
+                    poster: data.poster_name || "User",
                 };
 
                 setListing(transformedListing);

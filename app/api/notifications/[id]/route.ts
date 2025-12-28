@@ -4,9 +4,10 @@ import { headers } from "next/headers";
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await auth.api.getSession({
             headers: await headers(),
         });
@@ -17,7 +18,7 @@ export async function DELETE(
             });
         }
 
-        const notificationId = parseInt(params.id);
+        const notificationId = parseInt(id);
 
         // Verify the notification belongs to the user
         const { data: notification, error: fetchError } = await supabaseAdmin
@@ -40,6 +41,8 @@ export async function DELETE(
             .delete()
             .eq("id", notificationId)
             .eq("user_id", session.user.id);
+
+        if (error) throw error;
 
         return new Response(JSON.stringify({ success: true }), {
             status: 200,

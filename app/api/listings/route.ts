@@ -50,8 +50,8 @@ export async function POST(request: Request) {
             description,
             price,
             address,
-            moveIn,
-            moveOut,
+            move_in,
+            move_out,
             bedrooms,
             bathrooms,
             image,
@@ -63,8 +63,8 @@ export async function POST(request: Request) {
             !description ||
             !price ||
             !address ||
-            !moveIn ||
-            !moveOut ||
+            !move_in ||
+            !move_out ||
             !bedrooms ||
             !bathrooms
         ) {
@@ -73,6 +73,11 @@ export async function POST(request: Request) {
                 { status: 400 }
             );
         }
+
+        const poster_name =
+            session.user.user_metadata?.name ||
+            session.user.email?.split("@")[0] ||
+            "User";
 
         const { data: newListing, error } = await supabaseAdmin
             .from("listings")
@@ -83,12 +88,13 @@ export async function POST(request: Request) {
                     description,
                     price: price.toString(),
                     address,
-                    move_in: moveIn,
-                    move_out: moveOut,
+                    move_in: move_in,
+                    move_out: move_out,
                     bedrooms,
                     bathrooms,
                     image: image || null,
                     amenities: amenities || [],
+                    poster_name: poster_name,
                 },
             ])
             .select()

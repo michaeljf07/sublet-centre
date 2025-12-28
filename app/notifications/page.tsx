@@ -58,11 +58,17 @@ export default function NotificationsPage() {
 
     async function handleDelete(id: number) {
         try {
+            const token = await getAuthToken();
             const response = await fetch(`/api/notifications/${id}`, {
                 method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             if (response.ok) {
                 setNotifications(notifications.filter((n) => n.id !== id));
+            } else {
+                console.error("Failed to delete notification");
             }
         } catch (error) {
             console.error("Failed to delete notification:", error);
