@@ -7,6 +7,35 @@ import { ListingGrid } from "@/components/listings/ListingGrid";
 import { useFavorites } from "@/lib/favorites-context";
 import { Listing } from "@/types";
 
+async function fetchAllListings(): Promise<Listing[]> {
+    try {
+        const response = await fetch("http://localhost:3000/api/listings");
+        if (!response.ok) {
+            throw new Error("Failed to fetch listings");
+        }
+        const data = await response.json();
+
+        return data.map((listing: any) => ({
+            id: listing.id,
+            title: listing.title,
+            description: listing.description,
+            price: parseFloat(listing.price),
+            address: listing.address,
+            moveIn: listing.move_in,
+            moveOut: listing.move_out,
+            bedrooms: listing.bedrooms,
+            bathrooms: listing.bathrooms,
+            image: listing.image,
+            amenities: listing.amenities || [],
+            distance: "TBD",
+            poster: listing.poster_name || "User",
+        }));
+    } catch (err) {
+        console.error("Error fetching listings:", err);
+        return [];
+    }
+}
+
 export default function SavedPage() {
     const { favorites } = useFavorites();
     const [selectedListing, setSelectedListing] = useState<Listing | null>(
@@ -17,35 +46,11 @@ export default function SavedPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        async function fetchListings() {
+        async function loadListings() {
             try {
                 setLoading(true);
-                const response = await fetch("/api/listings");
-                if (!response.ok) {
-                    throw new Error("Failed to fetch listings");
-                }
-                const data = await response.json();
-
-                // Transform database listings to match Listing interface
-                const transformedListings: Listing[] = data.map(
-                    (listing: any) => ({
-                        id: listing.id,
-                        title: listing.title,
-                        description: listing.description,
-                        price: parseFloat(listing.price),
-                        address: listing.address,
-                        moveIn: listing.moveIn,
-                        moveOut: listing.moveOut,
-                        bedrooms: listing.bedrooms,
-                        bathrooms: listing.bathrooms,
-                        image: listing.image,
-                        amenities: listing.amenities || [],
-                        distance: "TBD",
-                        poster: listing.posterName || "User",
-                    })
-                );
-
-                setListings(transformedListings);
+                const data = await fetchAllListings();
+                setListings(data);
                 setError(null);
             } catch (err) {
                 console.error("Error fetching listings:", err);
@@ -56,7 +61,7 @@ export default function SavedPage() {
             }
         }
 
-        fetchListings();
+        loadListings();
     }, []);
 
     // Filter to only show favorited listings

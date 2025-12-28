@@ -7,18 +7,29 @@ import { Hero } from "@/components/home/Hero";
 import { ListingGrid } from "@/components/listings/ListingGrid";
 import { Listing } from "@/types";
 
-export default function Home() {
+interface HomeProps {
+    initialListings?: Listing[];
+}
+
+export default function Home({ initialListings = [] }: HomeProps) {
     const [inputValue, setInputValue] = useState<string>("");
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedListing, setSelectedListing] = useState<Listing | null>(
         null
     );
-    const [listings, setListings] = useState<Listing[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [listings, setListings] = useState<Listing[]>(initialListings);
+    const [loading, setLoading] = useState<boolean>(
+        initialListings.length === 0
+    );
     const [error, setError] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState<string>("most-recent");
 
     useEffect(() => {
+        // Only fetch if we don't have initial listings
+        if (initialListings.length > 0) {
+            return;
+        }
+
         async function fetchListings() {
             try {
                 setLoading(true);
@@ -63,6 +74,58 @@ export default function Home() {
         }
 
         fetchListings();
+    }, []);
+
+    // Fetch listings when search term changes (including empty to get all)
+    useEffect(() => {
+        // Skip if we just have initial listings and search hasn't been triggered
+        if (initialListings.length > 0 && searchTerm === "") {
+            return;
+        }
+
+        async function searchListings() {
+            try {
+                setLoading(true);
+                const url = new URL("/api/listings", window.location.origin);
+                if (searchTerm.trim()) {
+                    url.searchParams.set("search", searchTerm);
+                }
+                const response = await fetch(url.toString());
+                if (!response.ok) {
+                    throw new Error("Failed to fetch listings");
+                }
+                const data = await response.json();
+
+                const transformedListings: Listing[] = data.map(
+                    (listing: any) => ({
+                        id: listing.id,
+                        title: listing.title,
+                        description: listing.description,
+                        price: parseFloat(listing.price),
+                        address: listing.address,
+                        moveIn: listing.move_in,
+                        moveOut: listing.move_out,
+                        bedrooms: listing.bedrooms,
+                        bathrooms: listing.bathrooms,
+                        image: listing.image,
+                        amenities: listing.amenities || [],
+                        distance: "TBD",
+                        poster: listing.poster_name || "User",
+                    })
+                );
+
+                setListings(transformedListings);
+                setError(null);
+            } catch (err) {
+                console.error("Error searching listings:", err);
+                setError("Failed to load listings. Please try again later.");
+                setListings([]);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        searchListings();
     }, [searchTerm]);
 
     // Filter listings based on search term inputted by user (typed)
@@ -91,8 +154,8 @@ export default function Home() {
         }
     }, [filteredListings, sortBy]);
 
-    function handleSearch() {
-        setSearchTerm(inputValue);
+    function handleSearch(term?: string) {
+        setSearchTerm(term ?? inputValue);
     }
 
     return (
