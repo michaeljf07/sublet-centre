@@ -38,10 +38,10 @@ export default function AuthPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
             <Header />
-            <div className="flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
-                <div className="w-full max-w-md space-y-6 md:space-y-8 bg-white p-6 md:p-8 rounded-xl shadow-md">
+            <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+                <div className="w-full max-w-md space-y-6 md:space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
                     <div>
                         <h2 className="mt-2 md:mt-6 text-center text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
                             Sign in to SubletSync
@@ -49,7 +49,7 @@ export default function AuthPage() {
                     </div>
 
                     {error && (
-                        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+                        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700 border border-red-200">
                             {error}
                         </div>
                     )}
@@ -58,7 +58,7 @@ export default function AuthPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-sm font-medium text-gray-700">
+                                className="block text-sm font-medium text-gray-700 mb-1.5">
                                 Email
                             </label>
                             <input
@@ -67,7 +67,7 @@ export default function AuthPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 placeholder="you@uwaterloo.com"
                             />
                         </div>
@@ -75,7 +75,7 @@ export default function AuthPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium text-gray-700">
+                                className="block text-sm font-medium text-gray-700 mb-1.5">
                                 Password
                             </label>
                             <input
@@ -84,7 +84,7 @@ export default function AuthPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -92,7 +92,7 @@ export default function AuthPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full rounded-md bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50 hover:cursor-pointer">
+                            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-white font-semibold hover:bg-blue-700 disabled:opacity-50 hover:cursor-pointer transition-colors duration-200">
                             {isLoading ? "Signing in..." : "Sign in"}
                         </button>
                     </form>

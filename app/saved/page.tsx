@@ -73,11 +73,14 @@ export default function SavedPage() {
         <div className="min-h-screen bg-gray-50">
             <Header />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">
+                    <h1 className="text-4xl font-bold text-gray-900">
                         Saved Listings
                     </h1>
+                    <p className="text-gray-600 mt-2">
+                        Your favorite properties
+                    </p>
                     <p className="mt-2 text-gray-600">
                         {savedListings.length} listing
                         {savedListings.length !== 1 ? "s" : ""} saved
@@ -85,11 +88,11 @@ export default function SavedPage() {
                 </div>
 
                 {loading ? (
-                    <div className="bg-white rounded-lg shadow p-12 text-center">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
                         <p className="text-gray-600">Loading listings...</p>
                     </div>
                 ) : error ? (
-                    <div className="bg-white rounded-lg shadow p-12 text-center">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
                         <p className="text-red-600">{error}</p>
                     </div>
                 ) : savedListings.length > 0 ? (
@@ -98,7 +101,7 @@ export default function SavedPage() {
                         onSelectListing={setSelectedListing}
                     />
                 ) : (
-                    <div className="bg-white rounded-lg shadow p-12 text-center">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
                             No saved listings yet
                         </h3>
@@ -107,7 +110,7 @@ export default function SavedPage() {
                         </p>
                         <a
                             href="/"
-                            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition">
+                            className="inline-block px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors duration-200">
                             Browse Listings
                         </a>
                     </div>

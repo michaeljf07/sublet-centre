@@ -16,15 +16,20 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
     onSortChange,
 }) => {
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                    {listings.length} Available Sublets
-                </h2>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-900">
+                        Available Sublets
+                    </h2>
+                    <p className="text-gray-600 text-sm mt-1">
+                        {listings.length} properties found
+                    </p>
+                </div>
                 <select
                     value={sortBy}
                     onChange={(e) => onSortChange?.(e.target.value)}
-                    className="px-4 py-2 border border-gray-600 rounded-lg text-gray-900">
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                     <option value="most-recent">Most Recent</option>
                     <option value="price-low-to-high">
                         Price: Low to High
