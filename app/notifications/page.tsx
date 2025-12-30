@@ -77,9 +77,9 @@ export default function NotificationsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-white">
                 <Header />
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-16">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                         <p className="mt-4 text-gray-600">
@@ -97,18 +97,18 @@ export default function NotificationsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
             <Header />
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
                         <Bell className="w-8 h-8 text-blue-600" />
                         Notifications
                     </h1>
                 </div>
 
                 {notifications.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow p-8 text-center">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
                         <Bell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                         <p className="text-gray-600">
                             You don't have any notifications yet
@@ -119,10 +119,10 @@ export default function NotificationsPage() {
                         {notifications.map((notification) => (
                             <div
                                 key={notification.id}
-                                className={`bg-white rounded-lg shadow p-6 transition ${
+                                className={`bg-white rounded-xl shadow-sm border transition p-6 ${
                                     !notification.read
                                         ? "border-l-4 border-blue-600"
-                                        : ""
+                                        : "border-gray-100"
                                 }`}>
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">

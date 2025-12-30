@@ -56,9 +56,9 @@ export default function MessagesPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="min-h-screen bg-white flex flex-col">
                 <Header />
-                <div className="flex-1 flex items-center justify-center py-12">
+                <div className="flex-1 flex items-center justify-center">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                         <p className="mt-4 text-gray-600">
@@ -91,20 +91,20 @@ export default function MessagesPage() {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <Header />
-            <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+            <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-8">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-8">
                         Messages
                     </h1>
 
                     {messages.length === 0 ? (
-                        <div className="bg-white rounded-lg shadow p-8 text-center">
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
                             <p className="text-gray-900 mb-4">
                                 You don't have any messages yet
                             </p>
                             <button
                                 onClick={() => router.push("/")}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:cursor-pointer">
+                                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:cursor-pointer font-semibold transition-colors duration-200">
                                 Browse Listings
                             </button>
                         </div>
@@ -117,7 +117,7 @@ export default function MessagesPage() {
                                     return (
                                         <div
                                             key={otherId}
-                                            className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition">
+                                            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-lg transition">
                                             <div className="flex items-start justify-between">
                                                 <div>
                                                     <h3 className="text-xl font-semibold text-gray-900">

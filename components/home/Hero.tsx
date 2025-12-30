@@ -25,24 +25,24 @@ export const Hero: React.FC<HeroProps> = ({
         }
     }
     return (
-        <div className="bg-linear-to-r from-blue-600 to-blue-800 text-white py-12 md:py-16">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-14 md:py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                    <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold mb-3 tracking-tight">
                         Find Your Perfect Sublet
                     </h1>
-                    <p className="text-lg md:text-xl mb-8 text-blue-100">
+                    <p className="text-lg md:text-lg mb-10 text-blue-100">
                         Housing solutions that sync with your co-op schedule
                     </p>
 
-                    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-4">
+                    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-xl p-6">
                         <div className="flex flex-col gap-3">
                             <div className="flex-1 relative">
-                                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Search by location or keyword..."
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     value={searchTerm}
                                     onChange={(e) =>
                                         onSearchChange(e.target.value)
@@ -60,7 +60,7 @@ export const Hero: React.FC<HeroProps> = ({
                                     onChange={(e) =>
                                         handleTermChange(e.target.value)
                                     }
-                                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500">
+                                    className="flex-1 px-4 py-3.5 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                                     <option>All Terms</option>
                                     <option>Spring 2026</option>
                                     <option>Fall 2026</option>
@@ -68,7 +68,7 @@ export const Hero: React.FC<HeroProps> = ({
                                 </select>
                                 <button
                                     onClick={() => onSearch()}
-                                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium hover:cursor-pointer transition">
+                                    className="px-8 py-3.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold hover:cursor-pointer transition-colors duration-200">
                                     Search
                                 </button>
                             </div>
