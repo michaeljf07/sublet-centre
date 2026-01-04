@@ -14,38 +14,23 @@ export async function GET(request: Request) {
             query = query.eq("user_id", userId);
         }
 
-        const { data: allListings, error } = await query;
-
-        if (error) throw error;
-
-        // Server-side search if search term provided
         if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            const filtered =
-                allListings?.filter((listing: any) => {
-                    const searchableText = [
-                        listing.title,
-                        listing.description,
-                        listing.address,
-                        listing.search_terms,
-                        ...(Array.isArray(listing.amenities)
-                            ? listing.amenities
-                            : []),
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-                        .toLowerCase();
-
-                    return searchableText.includes(term);
-                }) || [];
-
-            return new Response(JSON.stringify(filtered), {
-                status: 200,
-                headers: { "Content-Type": "application/json" },
-            });
+            // Use ilike for case-insensitive search on string fields only
+            const term = `%${searchTerm}%`;
+            query = query.or(
+                [
+                    `title.ilike.${term}`,
+                    `description.ilike.${term}`,
+                    `address.ilike.${term}`,
+                    `search_terms.ilike.${term}`,
+                ].join(",")
+            );
         }
 
-        return new Response(JSON.stringify(allListings), {
+        const { data: listings, error } = await query;
+        if (error) throw error;
+
+        return new Response(JSON.stringify(listings), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });

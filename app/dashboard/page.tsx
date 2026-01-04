@@ -44,14 +44,14 @@ export default function DashboardPage() {
                             description: listing.description,
                             price: parseFloat(listing.price),
                             address: listing.address,
-                            moveIn: listing.moveIn,
-                            moveOut: listing.moveOut,
+                            moveIn: listing.move_in,
+                            moveOut: listing.move_out,
                             bedrooms: listing.bedrooms,
                             bathrooms: listing.bathrooms,
                             image: listing.image,
                             amenities: listing.amenities || [],
                             distance: "TBD",
-                            poster: listing.posterName || "User",
+                            poster: listing.poster_name || "User",
                         })
                     );
                     setAllListings(transformedListings);
@@ -70,8 +70,8 @@ export default function DashboardPage() {
                             description: listing.description,
                             price: parseFloat(listing.price),
                             address: listing.address,
-                            moveIn: listing.move_in,
-                            moveOut: listing.move_out,
+                            moveIn: listing.moveIn,
+                            moveOut: listing.moveOut,
                             bedrooms: listing.bedrooms,
                             bathrooms: listing.bathrooms,
                             image: listing.image,

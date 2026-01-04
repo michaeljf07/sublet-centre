@@ -57,7 +57,7 @@ export async function PUT(
         // Check if user owns the listing
         const { data: listing, error: fetchError } = await supabaseAdmin
             .from("listings")
-            .select("userId")
+            .select("user_id")
             .eq("id", listingId)
             .single();
 
@@ -68,7 +68,7 @@ export async function PUT(
             );
         }
 
-        if (listing.userId !== session.user.id) {
+        if (listing.user_id !== session.user.id) {
             return new Response(JSON.stringify({ error: "Forbidden" }), {
                 status: 403,
             });
@@ -80,8 +80,8 @@ export async function PUT(
             description,
             price,
             address,
-            moveIn,
-            moveOut,
+            move_in,
+            move_out,
             bedrooms,
             bathrooms,
             image,
@@ -93,8 +93,8 @@ export async function PUT(
             !description ||
             !price ||
             !address ||
-            !moveIn ||
-            !moveOut ||
+            !move_in ||
+            !move_out ||
             !bedrooms ||
             !bathrooms
         ) {
@@ -112,13 +112,12 @@ export async function PUT(
                 description,
                 price: price.toString(),
                 address,
-                moveIn,
-                moveOut,
+                move_in,
+                move_out,
                 bedrooms,
                 bathrooms,
                 image: image || null,
                 amenities: amenities || [],
-                updatedAt: new Date().toISOString(),
             })
             .eq("id", listingId)
             .select()
