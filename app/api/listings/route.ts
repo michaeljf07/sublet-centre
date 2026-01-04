@@ -22,7 +22,7 @@ export async function GET(request: Request) {
                     `title.ilike.${term}`,
                     `description.ilike.${term}`,
                     `address.ilike.${term}`,
-                    `search_terms.ilike.${term}`
+                    `search_terms.ilike.${term}`,
                 ].join(",")
             );
         }
