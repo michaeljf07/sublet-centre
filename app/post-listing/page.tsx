@@ -62,11 +62,11 @@ export default function PostListingPage() {
                     const listing = await response.json();
 
                     // Format dates for input fields
-                    const moveInDate = listing.moveIn
-                        ? new Date(listing.moveIn).toISOString().split("T")[0]
+                    const moveInDate = listing.move_in
+                        ? new Date(listing.move_in).toISOString().split("T")[0]
                         : "";
-                    const moveOutDate = listing.moveOut
-                        ? new Date(listing.moveOut).toISOString().split("T")[0]
+                    const moveOutDate = listing.move_out
+                        ? new Date(listing.move_out).toISOString().split("T")[0]
                         : "";
 
                     setFormData({
@@ -148,10 +148,16 @@ export default function PostListingPage() {
 
         try {
             const listingData = {
-                ...formData,
+                title: formData.title,
+                description: formData.description,
                 price: parseFloat(formData.price),
+                address: formData.address,
+                move_in: formData.moveIn,
+                move_out: formData.moveOut,
                 bedrooms: parseInt(formData.bedrooms),
                 bathrooms: parseInt(formData.bathrooms),
+                image: formData.image,
+                amenities: formData.amenities,
             };
 
             let token = await getAuthToken();
